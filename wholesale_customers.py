@@ -5,6 +5,8 @@
 import pandas as pd
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score
+import itertools
+import matplotlib.pyplot as plt
 def read_csv_2(data_file):
 	df = pd.read_csv(data_file)
 	df = df.drop(['channel', 'region'], axis=1)
@@ -97,5 +99,19 @@ def best_clustering_score(rdf):
 # Generate a scatter plot for each pair of attributes.
 # Data points in different clusters should appear with different colors.
 def scatter_plots(df):
-	pass
+	df = standardize(df)
+	k = 3
+	kmeans = KMeans(n_clusters=k, init='random', n_init=1, random_state=0)
+	kmeans.fit(df)
+	labels = kmeans.labels_
+	attributes = df.columns
+	pairs = list(itertools.combinations(attributes, 2))
+	dir = 'cluster_results/'
+	for pair in pairs:
+		df.plot.scatter(x=pair[0], y=pair[1], c=labels, colormap='viridis')
+		plt.show()
+		file_path = f"{dir}scatter_{pair[0]}_add_{pair[1]}_k{k}.png"
+		plt.savefig(file_path)
+		plt.close()
+	
 
