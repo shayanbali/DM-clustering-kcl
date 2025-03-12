@@ -3,7 +3,8 @@
 # Return a pandas dataframe containing the data set that needs to be extracted from the data_file.
 # data_file will be populated with the string 'wholesale_customers.csv'.
 import pandas as pd
-
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.metrics import silhouette_score
 def read_csv_2(data_file):
 	df = pd.read_csv(data_file)
 	df = df.drop(['channel', 'region'], axis=1)
@@ -22,7 +23,9 @@ def summary_statistics(df):
 # where each attribute value is subtracted by the mean and then divided by the
 # standard deviation for that attribute.
 def standardize(df):
-	pass
+	df = df.select_dtypes(include=['number'])
+	df = (df - df.mean()) / df.std()
+	return df
 
 # Given a dataframe df and a number of clusters k, return a pandas series y
 # specifying an assignment of instances to clusters, using kmeans.
@@ -30,24 +33,33 @@ def standardize(df):
 # To see the impact of the random initialization,
 # using only one set of initial centroids in the kmeans run.
 def kmeans(df, k):
-	pass
+	df = df.select_dtypes(include=['number'])
+	kmeans = KMeans(n_clusters=k, init='random', n_init=1, random_state=0)
+	kmeans.fit(df)
+	return pd.Series(kmeans.labels_, index=df.index, name="Cluster")
 
 # Given a dataframe df and a number of clusters k, return a pandas series y
 # specifying an assignment of instances to clusters, using kmeans++.
 # y should contain values from the set {0,1,...,k-1}.
 def kmeans_plus(df, k):
-	pass
+	df = df.select_dtypes(include=['number'])
+	kmeans = KMeans(n_clusters=k, init='k-means++', n_init=10, random_state=0)
+	kmeans.fit(df)
+	return pd.Series(kmeans.labels_, index=df.index, name="Cluster")
 
 # Given a dataframe df and a number of clusters k, return a pandas series y
 # specifying an assignment of instances to clusters, using agglomerative hierarchical clustering.
 # y should contain values from the set {0,1,...,k-1}.
 def agglomerative(df, k):
-	pass
+	df = df.select_dtypes(include=['number'])
+	agg = AgglomerativeClustering(n_clusters=k)
+	agg.fit(df)
+	return pd.Series(agg.labels_, index=df.index, name="Cluster")
 
 # Given a data set X and an assignment to clusters y
 # return the Silhouette score of this set of clusters.
 def clustering_score(X,y):
-	pass
+	score = silhouette_score(X, y)  
 
 # Perform the cluster evaluation described in the coursework description.
 # Given the dataframe df with the data to be clustered,
@@ -58,12 +70,28 @@ def clustering_score(X,y):
 # 'k': the number of clusters produced,
 # 'Silhouette Score': for evaluating the resulting set of clusters.
 def cluster_evaluation(df):
-	pass
+	result = []
+	list_of_algorithms = ['Kmeans', 'Agglomerative']
+	list_of_data_types = ['Original', 'Standardized']
+	list_of_k = [3, 5, 10]
+	for algorithm in list_of_algorithms:
+		for data_type in list_of_data_types:
+			if data_type == 'Standardized':
+				df = standardize(df)
+			for k in list_of_k:
+				if algorithm == 'Kmeans':
+					y = kmeans(df, k)
+				else:
+					y = agglomerative(df, k)
+					score = silhouette_score(df, y)
+					result.append({'Algorithm': algorithm, 'data type': data_type, 'k': k, 'Silhouette Score': score})
+	return pd.DataFrame(result)
+		
 
 # Given the performance evaluation dataframe produced by the cluster_evaluation function,
 # return the best computed Silhouette score.
 def best_clustering_score(rdf):
-	pass
+	return rdf['Silhouette Score'].max()
 
 # Run the Kmeans algorithm with k=3 by using the standardized data set.
 # Generate a scatter plot for each pair of attributes.
