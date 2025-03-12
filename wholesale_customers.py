@@ -1,65 +1,73 @@
-# Decision Tree Classifier for Income Prediction
+# Part 2: Cluster Analysis
 
-## Overview
-This project implements a **Decision Tree Classifier** to predict whether an individual's income is **≤ 50K or > 50K** based on attributes like age, working hours, and education level. The model is trained on given data, and the training error rate is computed.
-
-## Requirements
-Install dependencies using:
-```bash
-pip install pandas scikit-learn
-```
-
-## Usage
-### 1. Load Data
-```python
+# Return a pandas dataframe containing the data set that needs to be extracted from the data_file.
+# data_file will be populated with the string 'wholesale_customers.csv'.
 import pandas as pd
 
-df = pd.DataFrame({
-    'Age': [25, 45, 35, 50],
-    'HoursPerWeek': [40, 50, 60, 45],
-    'Education': [10, 14, 16, 12],
-    'Income': ['<=50K', '>50K', '>50K', '<=50K']
-})
+def read_csv_2(data_file):
+	df = pd.read_csv(data_file)
+	df = df.drop(['channel', 'region'], axis=1)
+	return df
 
-X_train = df.drop(columns=['Income'])  # Input features
-y_train = df['Income']  # Labels
-```
+# Return a pandas dataframe with summary statistics of the data.
+# Namely, 'mean', 'std' (standard deviation), 'min', and 'max' for each attribute.
+# These strings index the new dataframe columns. 
+# Each row should correspond to an attribute in the original data and be indexed with the attribute name.
+def summary_statistics(df):
+	df = df.select_dtypes(include=['number'])
+	df = df.aggregate(['mean', 'std', 'min', 'max']).T
+	return df
 
-### 2. Train and Predict
-```python
-from decision_tree_classifier import dt_predict
+# Given a dataframe df with numeric values, return a dataframe (new copy)
+# where each attribute value is subtracted by the mean and then divided by the
+# standard deviation for that attribute.
+def standardize(df):
+	pass
 
-predictions = dt_predict(X_train, y_train)
-print(predictions)
-```
+# Given a dataframe df and a number of clusters k, return a pandas series y
+# specifying an assignment of instances to clusters, using kmeans.
+# y should contain values in the set {0,1,...,k-1}.
+# To see the impact of the random initialization,
+# using only one set of initial centroids in the kmeans run.
+def kmeans(df, k):
+	pass
 
-### 3. Expected Output
-- A **pandas Series** of predicted labels (`<=50K` or `>50K`).
-- **Training error rate** displayed.
+# Given a dataframe df and a number of clusters k, return a pandas series y
+# specifying an assignment of instances to clusters, using kmeans++.
+# y should contain values from the set {0,1,...,k-1}.
+def kmeans_plus(df, k):
+	pass
 
-Example:
-```
-Training Error Rate: 0.0000
-0    <=50K
-1     >50K
-2     >50K
-3    <=50K
-```
+# Given a dataframe df and a number of clusters k, return a pandas series y
+# specifying an assignment of instances to clusters, using agglomerative hierarchical clustering.
+# y should contain values from the set {0,1,...,k-1}.
+def agglomerative(df, k):
+	pass
 
-## Function Overview
-### `dt_predict(X_train, y_train)`
-1. Trains a **Decision Tree Classifier**.
-2. Predicts labels for `X_train`.
-3. Computes **training error rate**.
-4. Returns a **pandas Series** with predictions.
+# Given a data set X and an assignment to clusters y
+# return the Silhouette score of this set of clusters.
+def clustering_score(X,y):
+	pass
 
-## Customization
-Modify `DecisionTreeClassifier` parameters for better performance:
-```python
-clf = DecisionTreeClassifier(max_depth=5, min_samples_split=10, random_state=42)
-```
-- `max_depth=5`: Prevents overfitting.
-- `min_samples_split=10`: Requires at least 10 samples for a split.
+# Perform the cluster evaluation described in the coursework description.
+# Given the dataframe df with the data to be clustered,
+# return a pandas dataframe with an entry for each clustering algorithm execution.
+# Each entry should contain the: 
+# 'Algorithm' name: either 'Kmeans' or 'Agglomerative', 
+# 'data' type: either 'Original' or 'Standardized',
+# 'k': the number of clusters produced,
+# 'Silhouette Score': for evaluating the resulting set of clusters.
+def cluster_evaluation(df):
+	pass
 
-## License
-Open-source and free to use.
+# Given the performance evaluation dataframe produced by the cluster_evaluation function,
+# return the best computed Silhouette score.
+def best_clustering_score(rdf):
+	pass
+
+# Run the Kmeans algorithm with k=3 by using the standardized data set.
+# Generate a scatter plot for each pair of attributes.
+# Data points in different clusters should appear with different colors.
+def scatter_plots(df):
+	pass
+
